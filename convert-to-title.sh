@@ -32,7 +32,8 @@ esac
 case $env in
 
 OSX)
-  speaker = $(echo say -v \? | grep de_DE | awk 'NR==1{print $1}')
+  speaker=$(say -v \? | grep de_DE | awk 'NR==1{print $1}')
+  echo $speaker
   for inputfile in *; do
     echo "$inputfile"
     title=$(exiftool -json "$inputfile" | jq -r '.[0].Title') && echo $title && say -v $speaker "$title" -o title.wav --data-format=LEF32@22050
