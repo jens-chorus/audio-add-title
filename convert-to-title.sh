@@ -1,17 +1,5 @@
 #!/bin/sh
 
-while [[ "$#" -gt 0 ]]; do
-  case $1 in
-    --locale)
-      locale="$2"
-      shift
-      ;;
-  esac
-  shift
-done
-#Print the argument values
-printf "locale: $locale\n"
-
 readonly ENV_OSX='Mac OS X'
 readonly ENV_LINUX='Linux'
 
@@ -42,6 +30,17 @@ detect_environment() {
 }
 
 env="$(detect_environment)"
+
+while [[ "$#" -gt 0 ]]; do
+  case $1 in
+    --locale)
+      locale="$2"
+      shift
+      ;;
+  esac
+  shift
+done
+
 if [ -z ${locale+x} ]; then
   locale="de_DE"
 fi
