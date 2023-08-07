@@ -29,13 +29,26 @@ detect_environment() {
   esac
 }
 
-
 env="$(detect_environment)"
+
+while [[ "$#" -gt 0 ]]; do
+  case $1 in
+    --locale)
+      locale="$2"
+      shift
+      ;;
+  esac
+  shift
+done
+
+if [ -z ${locale+x} ]; then
+  locale="de_DE"
+fi
 
 case $env in
   ${ENV_OSX})
-    speaker=$(say -v \? | grep de_DE | awk 'NR==1{print $1}')
-    echo $speaker
+    speaker=$(say -v \? | grep "$locale" | awk 'NR==1{print $1}')
+    echo "speaker " $speaker
     for inputfile in *; do
       echo "$inputfile"
       title=$(exiftool -json "$inputfile" | jq -r '.[0].Title') && echo $title && say -v $speaker "$title" -o title.wav --data-format=LEF32@22050
