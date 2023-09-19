@@ -24,12 +24,57 @@ detect_environment() {
     #   ;;
     *)
       print_error "Detected unsupported environment: ${raw_env}"
-      exit 0
+      exit 1
       ;;
   esac
 }
 
+check_dependencies_list()
+{
+  dependencies=$1
+  
+  set -- ${dependencies}
+  while [ -n "$1" ]; do
+    dependency=$1
+    command -v ${dependency} >/dev/null 2>&1 || {
+      print_error "${dependency} needs to be installed."
+      echo 1
+    }
+    shift
+  done
+}
+
+check_dependencies()
+{
+  env=$1
+  echo "Checking dependencies... "
+  
+  common_dependencies="jq ffmpeg exiftool"
+  deps_are_missing=$(check_dependencies_list "${common_dependencies}")
+  
+  case $env in
+    ${ENV_OSX})
+      echo "OSX"
+      ;;
+    ${ENV_LINUX})
+      linux_dependencies="espeak"
+      deps_are_missing="${deps_are_missing}$(check_dependencies_list "${linux_dependencies}")"
+      ;;
+  esac
+  
+  if [ -n "${deps_are_missing}" ]
+  then {
+    print_error "Install the above and rerun this script"
+    exit 1
+  }
+  else
+    echo "\tOK"
+  fi
+}
+
+
 env="$(detect_environment)"
+check_dependencies "${env}"
 
 while [[ "$#" -gt 0 ]]; do
   case $1 in
@@ -64,4 +109,4 @@ case $env in
     ;;
 esac
 
-exit 1
+exit 0
